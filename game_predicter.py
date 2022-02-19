@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import tensorflow as tf
+import tensorflowjs as tfjs
 
 # A list of the files (with paths thereto) which will be used as data sources to train the model. 
 # These files are not included in the present repository for copyright reasons; I used www.football-data.co.uk for this purpose
@@ -10,11 +11,11 @@ list_of_files = ['2122.csv', '2021.csv', '1920.csv', '1819.csv', '1718.csv']
 set_of_club_names = set()
 number_of_games = 0
 
-# A callback to end training when the (admittedly mediocre) accuracy of 55 % is reached
+# A callback to end training when the (admittedly mediocre) accuracy of 54 % is reached
 class myCallback(tf.keras.callbacks.Callback):
 	def on_epoch_end(self, epoch, logs=None):
-		if logs.get('accuracy') >= 0.55:
-			print("\nEnding training after reaching 55 % accuracy")
+		if logs.get('accuracy') >= 0.54:
+			print("\nEnding training after reaching 54 % accuracy")
 			self.model.stop_training = True
 			
 callbacks = myCallback()
@@ -78,7 +79,7 @@ model = tf.keras.Sequential([		# The model itself
 	tf.keras.layers.Dense(3, activation='softmax')
 ])
 
-model.compile(optimizer='sgd', loss='mean_squared_error', metrics='accuracy')
+model.compile(optimizer='adam', loss='mean_squared_error', metrics='accuracy')
 
 model.fit(x_data, y_data, epochs=100, callbacks=[callbacks])
 
@@ -90,19 +91,38 @@ for club in list_of_club_names:
 	k += 1
 print()
 
-# Ask user for a pairing to predict
-home_team_predict = int(input("Index number of home team for game to predict: "))
-away_team_predict = int(input("Index number of away team for game to predict: "))
-sample_to_predict = np.zeros(shape=(2, 2, number_of_clubs), dtype=int)
-
 # Get prediction for this pairing
-sample_to_predict[0][0][home_team_predict] = 1
-sample_to_predict[0][1][away_team_predict] = 1
-prediction = model(sample_to_predict, training=False)
-prob_home = float(prediction[0][0])
-prob_draw = float(prediction[0][1])
-prob_away = float(prediction[0][2])
-print("\nPrediction: ")
-print(f"Victory for home team: {round((prob_home * 100), 2)} %")
-print(f"Draw: {round((prob_draw * 100), 2)} %")
-print(f"Victory for away team: {round((prob_away * 100), 2)} %")
+while True:
+	# Ask user for a pairing to predict
+	home_team_predict = int(input("Index number of home team for game to predict: "))
+	away_team_predict = int(input("Index number of away team for game to predict: "))
+	sample_to_predict = np.zeros(shape=(1, 2, number_of_clubs), dtype=int)
+	
+	sample_to_predict[0][0][home_team_predict] = 1
+	sample_to_predict[0][1][away_team_predict] = 1
+	prediction = model(sample_to_predict, training=False)
+	prob_home = float(prediction[0][0])
+	prob_draw = float(prediction[0][1])
+	prob_away = float(prediction[0][2])
+	print("\nPrediction: ")
+	print(f"Victory for home team: {round((prob_home * 100), 2)} %")
+	print(f"Draw: {round((prob_draw * 100), 2)} %")
+	print(f"Victory for away team: {round((prob_away * 100), 2)} %")
+	print(f"Based on {number_of_games} games.")
+	#print("Prediction: ", prediction)
+	#print("Sample: ", sample_to_predict)
+	again = input("\nAnother game to predict (y/n)? ")
+	if again == "n" or again =="N":
+		break
+		
+savethis = input("Save this model (y/n)? ")
+if savethis == "y" or savethis == "Y":
+	clubdict = {}
+	i = 0
+	for club in list_of_club_names:
+		clubdict[i] = list_of_club_names[i]
+		i += 1
+	with open('clubs.txt', 'w') as file:
+		file.write(str(clubdict))
+	tfjs.converters.save_keras_model(model, "/Users/Internet/Desktop/Tensorflow Experiments/Bundesliga/")
+
