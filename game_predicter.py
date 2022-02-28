@@ -81,7 +81,7 @@ model = tf.keras.Sequential([		# The model itself
 
 model.compile(optimizer='adam', loss='mean_squared_error', metrics='accuracy')
 
-model.fit(x_data, y_data, epochs=100, callbacks=[callbacks])
+model.fit(x_data, y_data, epochs=250, callbacks=[callbacks])
 
 # Print out a list of teams in the dataset and the keys to access them:
 print()
@@ -117,12 +117,12 @@ while True:
 		
 savethis = input("Save this model (y/n)? ")
 if savethis == "y" or savethis == "Y":
-	clubdict = {}
-	i = 0
-	for club in list_of_club_names:
-		clubdict[i] = list_of_club_names[i]
-		i += 1
+	# The following lines generate the HTML code for the select menus in the website
+	generated_code = ""
+	sorted_list_of_club_names = sorted(list_of_club_names)
+	for club in sorted_list_of_club_names:
+		generated_code += f"<option value='{list_of_club_names.index(club)}'>{club}</option>\n"
+		
 	with open('clubs.txt', 'w') as file:
-		file.write(str(clubdict))
+		file.write(generated_code)
 	tfjs.converters.save_keras_model(model, "/Users/Internet/Desktop/Tensorflow Experiments/Bundesliga/")
-
