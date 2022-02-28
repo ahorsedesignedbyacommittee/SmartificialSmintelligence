@@ -9,4 +9,4 @@ The programme loads the data from files (by default in the same folder as the .p
 
 With the Bundesliga data I used, I get a training data accuracy of somewhere in the 50-55 % range, which is not great but significantly better than random guesses. A callback is in place to end training when the model reaches 55 % accuracy. There is no validation data, but you can, of course, use the model to predict upcoming games and validate on that basis.
 
-Version 1.5, February 2022
+Version 1.8, February 2022
