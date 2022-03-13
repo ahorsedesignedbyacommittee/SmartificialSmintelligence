@@ -1,12 +1,13 @@
 import csv
 import numpy as np
+from os import listdir
 import tensorflow as tf
 import tensorflowjs as tfjs
 
 # A list of the files (with paths thereto) which will be used as data sources to train the model. 
 # These files are not included in the present repository for copyright reasons; I used www.football-data.co.uk for this purpose
 # (but had to modify their CSV files since the columns for the goals scored were not uniform in them)
-list_of_files = ['2122.csv', '2021.csv', '1920.csv', '1819.csv', '1718.csv']
+list_of_files = listdir("data")
 
 set_of_club_names = set()
 number_of_games = 0
